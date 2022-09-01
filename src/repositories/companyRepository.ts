@@ -1,4 +1,4 @@
-import { connection } from "../database.js";
+import connection from "../config/database";
 
 export interface Company {
   id: number;
