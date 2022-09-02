@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { unprocessableError } from "../errorMiddleware";
 
 export function validateSchema(schema: any) {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -7,8 +8,11 @@ export function validateSchema(schema: any) {
     });
 
     if (error) {
-      const messageError = error.details.map((item: any) => item.message);
-      return res.status(422).send(messageError);
+      const messageError: string[] = error.details.map(
+        (err: any) => err.message
+      );
+
+      throw unprocessableError(messageError);
     }
 
     next();
