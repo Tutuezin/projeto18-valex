@@ -7,5 +7,5 @@ export async function createCard(req: Request, res: Response) {
 
   await cardService.createCard(Number(employeeId), type, apiKey);
 
-  res.status(201).send("card created");
+  return res.status(201).send("card created");
 }

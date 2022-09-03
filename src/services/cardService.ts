@@ -1,6 +1,7 @@
 import * as cardRepository from "../repositories/cardRepository";
 import * as companyRepository from "../repositories/companyRepository";
 import * as employeeRepository from "../repositories/employeeRepository";
+import * as cardUtils from "../utils/cardUtils";
 import { notFoundError, conflictError } from "../middlewares/errorMiddleware";
 import { faker } from "@faker-js/faker";
 import dotenv from "dotenv";
@@ -29,9 +30,11 @@ export async function createCard(
   const cryptr = new Cryptr(process.env.CRYPTR_SECRET_KEY);
 
   const cardNumber = faker.finance.creditCardNumber("#### #### #### ####");
-  const cardHolderName = employeeExists.fullName;
+  const employeeFullName = employeeExists.fullName;
   const expirationDate = dayjs().add(5, "years").format("MM/YY");
   const cardCVC = cryptr.encrypt(faker.finance.creditCardCVV());
+
+  const cardHolderName = cardUtils.generateCardName(employeeFullName);
 
   const cardInfos = {
     employeeId,
