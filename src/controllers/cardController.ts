@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
+import * as cardService from "../services/cardService";
 
 export async function createCard(req: Request, res: Response) {
-  try {
-    const apiKey = req.headers["x-api-key"];
+  const apiKey: any = req.headers["x-api-key"];
+  const { employeeId, type }: { employeeId: number; type: string } = req.body;
 
-    res.status(201).send("card created");
-  } catch (error) {
-    console.error(error);
-    res.sendStatus(500);
-  }
+  await cardService.createCard(Number(employeeId), type, apiKey);
+
+  res.status(201).send("card created");
 }
