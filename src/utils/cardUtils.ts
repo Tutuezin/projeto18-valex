@@ -48,3 +48,10 @@ export function validateActivateCard(
 export function validateBalanceCard(cardExists: any) {
   if (!cardExists) throw notFoundError("card");
 }
+
+export function validateBlockCard(cardExists: any, currentDay: string) {
+  if (!cardExists) throw notFoundError("card");
+  if (currentDay > cardExists.expirationDate)
+    throw accessDeniedError("activate card");
+  if (!cardExists.password) throw accessDeniedError("block card");
+}

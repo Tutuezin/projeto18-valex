@@ -10,6 +10,10 @@ import { faker } from "@faker-js/faker";
 import dotenv from "dotenv";
 import dayjs from "dayjs";
 import bcrypt from "bcrypt";
+import {
+  unauthorizedError,
+  badRequestError,
+} from "../middlewares/errorMiddleware";
 
 dotenv.config();
 
@@ -80,7 +84,6 @@ export async function activateCard(
 
   const salt = await bcrypt.genSalt();
   const hashedPassword = await bcrypt.hash(password, salt);
-  //const verifyPassword = bcrypt.compareSync(password, hashedPassword);
 
   await cardRepository.update(cardId, { password: hashedPassword });
 }
@@ -94,4 +97,18 @@ export async function balanceCard(cardId: number) {
   console.log(transactions);
   const recharge = await rechargeRepository.findByCardId(cardId);
   console.log(recharge);
+}
+
+export async function blockCard(cardId: number, password: string) {
+  const cardExists: any = await cardRepository.findById(cardId);
+  const currentDay = dayjs().format("MM/YY");
+  cardUtils.validateBlockCard(cardExists, currentDay);
+
+  const isBlocked = cardExists.isBlocked;
+  if (isBlocked) throw badRequestError("block");
+
+  const verifyPassword = bcrypt.compareSync(password, cardExists.password);
+  if (!verifyPassword) throw unauthorizedError("Password");
+
+  await cardRepository.update(cardId, { isBlocked: true });
 }

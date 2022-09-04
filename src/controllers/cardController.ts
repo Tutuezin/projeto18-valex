@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { NumberSchema } from "joi";
 import * as cardService from "../services/cardService";
 
 export async function createCard(req: Request, res: Response) {
@@ -35,4 +34,13 @@ export async function balanceCard(req: Request, res: Response) {
   const balanceAndTransactions = await cardService.balanceCard(Number(cardId));
 
   return res.status(200).send("foi");
+}
+
+export async function blockCard(req: Request, res: Response) {
+  const { cardId } = req.params;
+  const { password }: { password: string } = req.body;
+
+  await cardService.blockCard(Number(cardId), password);
+
+  return res.status(200).send("card was blocked");
 }

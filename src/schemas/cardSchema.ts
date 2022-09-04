@@ -17,3 +17,10 @@ export const activateCardSchema = Joi.object({
     .length(3)
     .required(),
 });
+
+export const passwordCardSchema = Joi.object({
+  password: Joi.string()
+    .regex(/^[0-9]*$/)
+    .length(4)
+    .required(),
+});
