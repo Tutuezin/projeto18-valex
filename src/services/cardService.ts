@@ -3,7 +3,6 @@ import * as companyRepository from "../repositories/companyRepository";
 import * as employeeRepository from "../repositories/employeeRepository";
 import * as paymentRepository from "../repositories/paymentRepository";
 import * as rechargeRepository from "../repositories/rechargeRepository";
-
 import * as cardUtils from "../utils/cardUtils";
 
 import { faker } from "@faker-js/faker";
@@ -124,18 +123,4 @@ export async function unblockCard(cardId: number, password: string) {
   if (!verifyPassword) throw unauthorizedError("Password");
 
   await cardRepository.update(cardId, { isBlocked: false });
-}
-
-export async function rechargeCard(
-  apiKey: string,
-  cardId: number,
-  amount: number
-) {
-  const apiKeyExists = await companyRepository.findByApiKey(apiKey);
-  const cardExists: any = await cardRepository.findById(cardId);
-  const currentDay = dayjs().format("MM/YY");
-
-  cardUtils.validateRechargeCard(apiKeyExists, cardExists, currentDay);
-
-  rechargeRepository.insert({ cardId, amount });
 }
