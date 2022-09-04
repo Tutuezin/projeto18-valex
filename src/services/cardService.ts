@@ -12,6 +12,7 @@ import { faker } from "@faker-js/faker";
 import dotenv from "dotenv";
 import dayjs from "dayjs";
 import bcrypt from "bcrypt";
+import { string } from "joi";
 
 dotenv.config();
 
@@ -22,16 +23,17 @@ export async function createCard(
 ) {
   //BUSINESS RULES
   const apiKeyExists = await companyRepository.findByApiKey(apiKey);
-  if (!apiKeyExists) throw notFoundError("company");
-
   const employeeExists = await employeeRepository.findById(employeeId);
-  if (!employeeExists) throw notFoundError("employee");
-
   const employeeCardType = await cardRepository.findByTypeAndEmployeeId(
     type,
     employeeId
   );
-  if (employeeCardType) throw conflictError(type);
+  cardUtils.validateCreateCard(
+    type,
+    apiKeyExists,
+    employeeExists,
+    employeeCardType
+  );
 
   //CARD INFOS
   const Cryptr = require("cryptr");
@@ -40,15 +42,15 @@ export async function createCard(
   const cardNumber = faker.finance.creditCardNumber("#### #### #### ####");
   const employeeFullName = employeeExists.fullName;
   const expirationDate = dayjs().add(5, "years").format("MM/YY");
-  const cardCVC = cryptr.encrypt(faker.finance.creditCardCVV());
-
+  const cardCVC = faker.finance.creditCardCVV();
+  const hashedCardCVC = cryptr.encrypt(cardCVC);
   const cardHolderName = cardUtils.generateCardName(employeeFullName);
 
   const cardInfos = {
     employeeId,
     number: cardNumber,
     cardholderName: cardHolderName,
-    securityCode: cardCVC,
+    securityCode: hashedCardCVC,
     expirationDate,
     isVirtual: false,
     isBlocked: false,
@@ -56,6 +58,8 @@ export async function createCard(
   };
 
   await cardRepository.insert(cardInfos);
+
+  return cardCVC;
 }
 
 export async function activateCard(
@@ -65,21 +69,17 @@ export async function activateCard(
 ) {
   //BUSINESS RULES
   const cardExists = await cardRepository.findById(cardId);
-  if (!cardExists) throw notFoundError("card");
-
   const currentDay = dayjs().format("MM/YY");
-  if (currentDay > cardExists.expirationDate)
-    throw accessDeniedError("activate card");
-
-  if (cardExists.password) throw accessDeniedError("activate card");
-
   const Cryptr = require("cryptr");
   const cryptr = new Cryptr(process.env.CRYPTR_SECRET_KEY);
   const decryptedCardCVC = cryptr.decrypt(cardExists.securityCode);
-  console.log(decryptedCardCVC);
 
-  if (decryptedCardCVC !== securityCode)
-    throw unauthorizedError("Security code");
+  cardUtils.validateActivateCard(
+    cardExists,
+    currentDay,
+    decryptedCardCVC,
+    securityCode
+  );
 
   const salt = await bcrypt.genSalt();
   const hashedPassword = await bcrypt.hash(password, salt);

@@ -1,3 +1,10 @@
+import {
+  notFoundError,
+  conflictError,
+  accessDeniedError,
+  unauthorizedError,
+} from "../middlewares/errorMiddleware";
+
 export function generateCardName(fullName: string): string {
   const [firstName, ...rest] = fullName.split(" ");
   const lastName = rest.pop();
@@ -11,4 +18,29 @@ export function generateCardName(fullName: string): string {
     .toUpperCase();
 
   return finalName;
+}
+
+export function validateCreateCard(
+  type: string,
+  apiKeyExists: any,
+  employeeExists: any,
+  employeeCardType: any
+) {
+  if (!apiKeyExists) throw notFoundError("company");
+  if (!employeeExists) throw notFoundError("employee");
+  if (employeeCardType) throw conflictError(type);
+}
+
+export function validateActivateCard(
+  cardExists: any,
+  currentDay: string,
+  decryptedCardCVC: string,
+  securityCode: string
+) {
+  if (!cardExists) throw notFoundError("card");
+  if (currentDay > cardExists.expirationDate)
+    throw accessDeniedError("activate card");
+  if (cardExists.password) throw accessDeniedError("activate card");
+  if (decryptedCardCVC !== securityCode)
+    throw unauthorizedError("Security code");
 }
