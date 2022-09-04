@@ -31,4 +31,10 @@ cardRouter.post(
   cardController.blockCard
 );
 
+cardRouter.post(
+  "/card/unblock/:cardId",
+  validateSchema(passwordCardSchema),
+  cardController.unblockCard
+);
+
 export default cardRouter;

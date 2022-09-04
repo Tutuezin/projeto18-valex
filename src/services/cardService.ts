@@ -112,3 +112,17 @@ export async function blockCard(cardId: number, password: string) {
 
   await cardRepository.update(cardId, { isBlocked: true });
 }
+
+export async function unblockCard(cardId: number, password: string) {
+  const cardExists: any = await cardRepository.findById(cardId);
+  const currentDay = dayjs().format("MM/YY");
+  cardUtils.validateBlockCard(cardExists, currentDay);
+
+  const isBlocked = cardExists.isBlocked;
+  if (!isBlocked) throw badRequestError("unblock");
+
+  const verifyPassword = bcrypt.compareSync(password, cardExists.password);
+  if (!verifyPassword) throw unauthorizedError("Password");
+
+  await cardRepository.update(cardId, { isBlocked: false });
+}

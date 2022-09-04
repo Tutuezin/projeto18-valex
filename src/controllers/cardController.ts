@@ -44,3 +44,12 @@ export async function blockCard(req: Request, res: Response) {
 
   return res.status(200).send("card was blocked");
 }
+
+export async function unblockCard(req: Request, res: Response) {
+  const { cardId } = req.params;
+  const { password }: { password: string } = req.body;
+
+  await cardService.unblockCard(Number(cardId), password);
+
+  return res.status(200).send("card was unblocked");
+}
