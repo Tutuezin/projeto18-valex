@@ -44,3 +44,7 @@ export function validateActivateCard(
   if (decryptedCardCVC !== securityCode)
     throw unauthorizedError("Security code");
 }
+
+export function validateBalanceCard(cardExists: any) {
+  if (!cardExists) throw notFoundError("card");
+}

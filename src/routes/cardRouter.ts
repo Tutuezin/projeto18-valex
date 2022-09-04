@@ -17,5 +17,6 @@ cardRouter.post(
   validateSchema(activateCardSchema),
   cardController.activateCard
 );
+cardRouter.get("/card/balance/:cardId", cardController.balanceCard);
 
 export default cardRouter;

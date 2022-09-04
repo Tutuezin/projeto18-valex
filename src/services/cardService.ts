@@ -1,18 +1,15 @@
 import * as cardRepository from "../repositories/cardRepository";
 import * as companyRepository from "../repositories/companyRepository";
 import * as employeeRepository from "../repositories/employeeRepository";
+import * as paymentRepository from "../repositories/paymentRepository";
+import * as rechargeRepository from "../repositories/rechargeRepository";
+
 import * as cardUtils from "../utils/cardUtils";
-import {
-  notFoundError,
-  conflictError,
-  accessDeniedError,
-  unauthorizedError,
-} from "../middlewares/errorMiddleware";
+
 import { faker } from "@faker-js/faker";
 import dotenv from "dotenv";
 import dayjs from "dayjs";
 import bcrypt from "bcrypt";
-import { string } from "joi";
 
 dotenv.config();
 
@@ -86,4 +83,15 @@ export async function activateCard(
   //const verifyPassword = bcrypt.compareSync(password, hashedPassword);
 
   await cardRepository.update(cardId, { password: hashedPassword });
+}
+
+export async function balanceCard(cardId: number) {
+  const cardExists = await cardRepository.findById(cardId);
+
+  cardUtils.validateBalanceCard(cardExists);
+
+  const transactions = await paymentRepository.findByCardId(cardId);
+  console.log(transactions);
+  const recharge = await rechargeRepository.findByCardId(cardId);
+  console.log(recharge);
 }

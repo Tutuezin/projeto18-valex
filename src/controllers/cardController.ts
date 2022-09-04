@@ -28,3 +28,11 @@ export async function activateCard(req: Request, res: Response) {
 
   return res.status(200).send("card activated");
 }
+
+export async function balanceCard(req: Request, res: Response) {
+  const { cardId } = req.params;
+
+  const balanceAndTransactions = await cardService.balanceCard(Number(cardId));
+
+  return res.status(200).send("foi");
+}
