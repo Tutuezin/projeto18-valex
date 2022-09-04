@@ -3,6 +3,7 @@ import {
   conflictError,
   accessDeniedError,
   unauthorizedError,
+  notAcceptableError,
 } from "../middlewares/errorMiddleware";
 
 export function generateCardName(fullName: string): string {
@@ -18,6 +19,18 @@ export function generateCardName(fullName: string): string {
     .toUpperCase();
 
   return finalName;
+}
+
+export function generateBalance(recharges: any, payments: any) {
+  let balancePositive = 0;
+  recharges.forEach((recharge: any) => (balancePositive += recharge.amount));
+
+  let balanceNegative = 0;
+  payments.forEach((payment: any) => (balanceNegative += payment.amount));
+
+  const balance = balancePositive - balanceNegative;
+
+  return balance;
 }
 
 export function validateCreateCard(
@@ -72,4 +85,23 @@ export function validateRechargeCard(
   if (!cardExists.password) throw accessDeniedError("recharge card");
   if (currentDay > cardExists.expirationDate)
     throw accessDeniedError("recharge card");
+}
+
+export function validatePayment(
+  cardExists: any,
+  currentDay: string,
+  businessExists: any
+) {
+  if (!cardExists) throw notFoundError("card");
+  if (currentDay > cardExists.expirationDate)
+    throw accessDeniedError("release payment");
+  if (!cardExists.password) throw accessDeniedError("release payment");
+  if (!businessExists) throw notFoundError("businesss");
+  if (cardExists.type !== businessExists.type)
+    throw notAcceptableError("type card is not the same business type!");
+}
+
+export function validateEnoughBalance(balance: number, amount: number) {
+  if (amount > balance)
+    throw notAcceptableError("amount is greater than the balance!");
 }

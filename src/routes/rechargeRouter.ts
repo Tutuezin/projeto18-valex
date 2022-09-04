@@ -2,7 +2,7 @@ import { Router } from "express";
 import * as rechargeController from "../controllers/rechargeController";
 import validateApiKey from "../middlewares/validations/apiKeyValidator";
 import { validateSchema } from "../middlewares/validations/schemaValidator";
-import { amountCardSchema } from "../schemas/cardSchema";
+import { amountCardSchema } from "../schemas/rechargeSchema";
 
 const rechargeRouter = Router();
 

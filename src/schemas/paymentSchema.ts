@@ -6,5 +6,4 @@ export const paymentSchema = Joi.object({
     .length(4)
     .required(),
   amount: Joi.number().min(1).required(),
-  businessId: Joi.number().required(),
 });

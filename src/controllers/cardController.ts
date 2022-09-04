@@ -33,7 +33,7 @@ export async function balanceCard(req: Request, res: Response) {
 
   const balanceAndTransactions = await cardService.balanceCard(Number(cardId));
 
-  return res.status(200).send("foi");
+  return res.status(200).send(balanceAndTransactions);
 }
 
 export async function blockCard(req: Request, res: Response) {

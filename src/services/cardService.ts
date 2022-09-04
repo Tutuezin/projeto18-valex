@@ -92,9 +92,15 @@ export async function balanceCard(cardId: number) {
   cardUtils.validateBalanceCard(cardExists);
 
   const transactions = await paymentRepository.findByCardId(cardId);
-  console.log(transactions);
-  const recharge = await rechargeRepository.findByCardId(cardId);
-  console.log(recharge);
+  const recharges = await rechargeRepository.findByCardId(cardId);
+
+  const balance = cardUtils.generateBalance(recharges, transactions);
+  const cardData = {
+    balance,
+    transactions,
+    recharges,
+  };
+  return cardData;
 }
 
 export async function blockCard(cardId: number, password: string) {
