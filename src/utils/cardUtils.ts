@@ -52,6 +52,24 @@ export function validateBalanceCard(cardExists: any) {
 export function validateBlockCard(cardExists: any, currentDay: string) {
   if (!cardExists) throw notFoundError("card");
   if (currentDay > cardExists.expirationDate)
-    throw accessDeniedError("activate card");
+    throw accessDeniedError("block card");
   if (!cardExists.password) throw accessDeniedError("block card");
+}
+export function validateUnblockCard(cardExists: any, currentDay: string) {
+  if (!cardExists) throw notFoundError("card");
+  if (currentDay > cardExists.expirationDate)
+    throw accessDeniedError("unblock card");
+  if (!cardExists.password) throw accessDeniedError("unblock card");
+}
+
+export function validateRechargeCard(
+  apiKeyExists: any,
+  cardExists: any,
+  currentDay: string
+) {
+  if (!apiKeyExists) throw notFoundError("company");
+  if (!cardExists) throw notFoundError("card");
+  if (!cardExists.password) throw accessDeniedError("recharge card");
+  if (currentDay > cardExists.expirationDate)
+    throw accessDeniedError("recharge card");
 }

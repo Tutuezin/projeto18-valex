@@ -68,7 +68,6 @@ export async function activateCard(
   securityCode: string,
   password: string
 ) {
-  //BUSINESS RULES
   const cardExists = await cardRepository.findById(cardId);
   const currentDay = dayjs().format("MM/YY");
   const Cryptr = require("cryptr");
@@ -116,7 +115,7 @@ export async function blockCard(cardId: number, password: string) {
 export async function unblockCard(cardId: number, password: string) {
   const cardExists: any = await cardRepository.findById(cardId);
   const currentDay = dayjs().format("MM/YY");
-  cardUtils.validateBlockCard(cardExists, currentDay);
+  cardUtils.validateUnblockCard(cardExists, currentDay);
 
   const isBlocked = cardExists.isBlocked;
   if (!isBlocked) throw badRequestError("unblock");
@@ -125,4 +124,18 @@ export async function unblockCard(cardId: number, password: string) {
   if (!verifyPassword) throw unauthorizedError("Password");
 
   await cardRepository.update(cardId, { isBlocked: false });
+}
+
+export async function rechargeCard(
+  apiKey: string,
+  cardId: number,
+  amount: number
+) {
+  const apiKeyExists = await companyRepository.findByApiKey(apiKey);
+  const cardExists: any = await cardRepository.findById(cardId);
+  const currentDay = dayjs().format("MM/YY");
+
+  cardUtils.validateRechargeCard(apiKeyExists, cardExists, currentDay);
+
+  rechargeRepository.insert({ cardId, amount });
 }

@@ -53,3 +53,13 @@ export async function unblockCard(req: Request, res: Response) {
 
   return res.status(200).send("card was unblocked");
 }
+
+export async function rechargeCard(req: Request, res: Response) {
+  const apiKey: any = req.headers["x-api-key"];
+  const { cardId } = req.params;
+  const { amount }: { amount: number } = req.body;
+
+  await cardService.rechargeCard(apiKey, Number(cardId), amount);
+
+  return res.status(201).send("recharge done");
+}

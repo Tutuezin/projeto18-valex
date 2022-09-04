@@ -24,3 +24,7 @@ export const passwordCardSchema = Joi.object({
     .length(4)
     .required(),
 });
+
+export const amountCardSchema = Joi.object({
+  amount: Joi.number().min(1).required(),
+});

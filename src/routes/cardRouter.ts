@@ -6,6 +6,7 @@ import {
   createCardSchema,
   activateCardSchema,
   passwordCardSchema,
+  amountCardSchema,
 } from "../schemas/cardSchema";
 
 const cardRouter = Router();
@@ -35,6 +36,13 @@ cardRouter.post(
   "/card/unblock/:cardId",
   validateSchema(passwordCardSchema),
   cardController.unblockCard
+);
+
+cardRouter.post(
+  "/card/recharge/:cardId",
+  validateApiKey,
+  validateSchema(amountCardSchema),
+  cardController.rechargeCard
 );
 
 export default cardRouter;
