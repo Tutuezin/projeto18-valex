@@ -2,10 +2,16 @@ import * as cardRepository from "../repositories/cardRepository";
 import * as companyRepository from "../repositories/companyRepository";
 import * as employeeRepository from "../repositories/employeeRepository";
 import * as cardUtils from "../utils/cardUtils";
-import { notFoundError, conflictError } from "../middlewares/errorMiddleware";
+import {
+  notFoundError,
+  conflictError,
+  accessDeniedError,
+  unauthorizedError,
+} from "../middlewares/errorMiddleware";
 import { faker } from "@faker-js/faker";
 import dotenv from "dotenv";
 import dayjs from "dayjs";
+import bcrypt from "bcrypt";
 
 dotenv.config();
 
@@ -14,6 +20,7 @@ export async function createCard(
   type: string,
   apiKey: string
 ) {
+  //BUSINESS RULES
   const apiKeyExists = await companyRepository.findByApiKey(apiKey);
   if (!apiKeyExists) throw notFoundError("company");
 
@@ -26,6 +33,7 @@ export async function createCard(
   );
   if (employeeCardType) throw conflictError(type);
 
+  //CARD INFOS
   const Cryptr = require("cryptr");
   const cryptr = new Cryptr(process.env.CRYPTR_SECRET_KEY);
 
@@ -48,4 +56,34 @@ export async function createCard(
   };
 
   await cardRepository.insert(cardInfos);
+}
+
+export async function activateCard(
+  cardId: number,
+  securityCode: string,
+  password: string
+) {
+  //BUSINESS RULES
+  const cardExists = await cardRepository.findById(cardId);
+  if (!cardExists) throw notFoundError("card");
+
+  const currentDay = dayjs().format("MM/YY");
+  if (currentDay > cardExists.expirationDate)
+    throw accessDeniedError("activate card");
+
+  if (cardExists.password) throw accessDeniedError("activate card");
+
+  const Cryptr = require("cryptr");
+  const cryptr = new Cryptr(process.env.CRYPTR_SECRET_KEY);
+  const decryptedCardCVC = cryptr.decrypt(cardExists.securityCode);
+  console.log(decryptedCardCVC);
+
+  if (decryptedCardCVC !== securityCode)
+    throw unauthorizedError("Security code");
+
+  const salt = await bcrypt.genSalt();
+  const hashedPassword = await bcrypt.hash(password, salt);
+  //const verifyPassword = bcrypt.compareSync(password, hashedPassword);
+
+  await cardRepository.update(cardId, { password: hashedPassword });
 }
