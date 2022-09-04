@@ -37,6 +37,4 @@ cardRouter.post(
   cardController.unblockCard
 );
 
-//cardRouter.post("/card/payments/:cardId/:businessId");
-
 export default cardRouter;
