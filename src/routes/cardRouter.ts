@@ -17,7 +17,7 @@ cardRouter.post(
   cardController.createCard
 );
 
-cardRouter.post(
+cardRouter.put(
   "/card/activate/:cardId",
   validateSchema(activateCardSchema),
   cardController.activateCard
@@ -25,13 +25,13 @@ cardRouter.post(
 
 cardRouter.get("/card/balance/:cardId", cardController.balanceCard);
 
-cardRouter.post(
+cardRouter.put(
   "/card/block/:cardId",
   validateSchema(passwordCardSchema),
   cardController.blockCard
 );
 
-cardRouter.post(
+cardRouter.put(
   "/card/unblock/:cardId",
   validateSchema(passwordCardSchema),
   cardController.unblockCard

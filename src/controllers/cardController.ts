@@ -5,17 +5,13 @@ export async function createCard(req: Request, res: Response) {
   const apiKey: any = req.headers["x-api-key"];
   const { employeeId, type }: { employeeId: number; type: string } = req.body;
 
-  const cardServiceCVC: string = await cardService.createCard(
+  const clientCard: any = await cardService.createCard(
     Number(employeeId),
     type,
     apiKey
   );
 
-  return res
-    .status(201)
-    .send(
-      `Your security code is ${cardServiceCVC}. Do not share it with anyone. `
-    );
+  return res.status(201).send(clientCard); /*   */
 }
 
 export async function activateCard(req: Request, res: Response) {

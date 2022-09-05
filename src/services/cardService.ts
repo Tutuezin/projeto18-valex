@@ -57,9 +57,17 @@ export async function createCard(
     type,
   };
 
+  const clientCard = {
+    number: cardNumber,
+    name: cardHolderName,
+    CVC: `Your security code is ${cardCVC}. Do not share it with anyone.`,
+    expiration: expirationDate,
+    type,
+  };
+
   await cardRepository.insert(cardInfos);
 
-  return cardCVC;
+  return clientCard;
 }
 
 export async function activateCard(
